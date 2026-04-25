@@ -27,7 +27,8 @@ RUN apt-get update && apt-get install -y \
 # Required by OpenImageIO's CMake config even when OpenCV support is unused
 RUN mkdir -p /usr/include/opencv4
 
-COPY src/colmap /colmap
+RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth 1 https://github.com/colmap/colmap.git /colmap
 RUN cd /colmap && mkdir build && cd build && \
     cmake .. -GNinja \
         -DCMAKE_CUDA_ARCHITECTURES=all-major \
