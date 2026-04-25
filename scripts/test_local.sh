@@ -56,11 +56,15 @@ if ! grep -q "completed successfully" "$TMPLOG"; then
   fail "Did not find 'completed successfully' in output"
 fi
 
-# Confirm ply_base64 has a non-trivial value (match ≥50 base64 chars after the key).
-PLY_SAMPLE=$(grep -o "'ply_base64': '[A-Za-z0-9+/=]\{50,\}'" "$TMPLOG" | head -c 80 || true)
+if ! grep -q "'ply_base64':" "$TMPLOG"; then
+  fail "ply_base64 key not found in output"
+fi
 
-if [[ -z "$PLY_SAMPLE" ]]; then
-  fail "ply_base64 is empty or suspiciously small"
+# A real PLY with gaussian splat data is several MB when base64-encoded.
+# A log under 100 KB means the value is empty or trivially small.
+LOGSIZE=$(wc -c < "$TMPLOG")
+if [[ "$LOGSIZE" -lt 100000 ]]; then
+  fail "Output suspiciously small (${LOGSIZE} bytes) — ply_base64 value likely empty"
 fi
 
 echo ""
