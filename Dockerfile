@@ -69,11 +69,12 @@ RUN apt-get update && apt-get install -y \
     libmkl-intel-lp64 \
     libmkl-intel-thread \
     libmkl-core \
+    libomp5 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=colmap-builder /colmap-install/ /usr/local/
 
-RUN pip3 install --no-cache-dir runpod numpy Pillow plyfile
+RUN pip3 install --no-cache-dir --break-system-packages runpod numpy Pillow plyfile
 
 WORKDIR /app
 COPY --from=brush-builder /brush/target/release/brush /app/binaries/brush_app_linux

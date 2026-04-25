@@ -41,27 +41,27 @@ echo "Running test job (steps=$STEPS, timeout=${TIMEOUT}s) ..."
 
 TEST_INPUT=$(printf '{"input":{"video_url":"%s","steps":%d}}' "$VIDEO_URL" "$STEPS")
 
-OUTPUT=$(timeout "$TIMEOUT" docker run --rm --gpus all \
+TMPLOG=$(mktemp)
+trap 'rm -f "$TMPLOG"' EXIT
+
+timeout "$TIMEOUT" docker run --rm --gpus all \
   "$IMAGE" \
-  python3 handler.py --test_input "$TEST_INPUT" 2>&1) || {
-  echo "$OUTPUT"
+  python3 handler.py --test_input "$TEST_INPUT" 2>&1 | tee "$TMPLOG" || {
   fail "Container exited non-zero or timed out after ${TIMEOUT}s"
 }
 
-echo "$OUTPUT"
-
 # ── validate output ───────────────────────────────────────────────────────────
-# The RunPod SDK logs results as Python repr (single quotes), not JSON.
-# Check for the SDK's own success line and presence of a non-trivial ply_base64.
-if ! echo "$OUTPUT" | grep -q "completed successfully"; then
+# Grep the log file directly — avoids echo pipeline issues with multi-MB output.
+if ! grep -q "completed successfully" "$TMPLOG"; then
   fail "Did not find 'completed successfully' in output"
 fi
 
-PLY_LEN=$(echo "$OUTPUT" | grep -o "'ply_base64': '[^']*'" | head -1 | wc -c || true)
+# Confirm ply_base64 has a non-trivial value (match ≥50 base64 chars after the key).
+PLY_SAMPLE=$(grep -o "'ply_base64': '[A-Za-z0-9+/=]\{50,\}'" "$TMPLOG" | head -c 80 || true)
 
-if [[ -z "$PLY_LEN" || "$PLY_LEN" -lt 100 ]]; then
+if [[ -z "$PLY_SAMPLE" ]]; then
   fail "ply_base64 is empty or suspiciously small"
 fi
 
 echo ""
-pass "Job completed successfully, ply_base64 present (~${PLY_LEN} chars sampled)"
+pass "Job completed successfully, ply_base64 present"
