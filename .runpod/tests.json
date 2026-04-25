@@ -23,7 +23,7 @@
       }
     ],
     "allowedCudaVersions": [
-      "12.9"
+      "12.9.3"
     ]
   }
 }
