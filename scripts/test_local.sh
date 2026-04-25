@@ -51,24 +51,17 @@ OUTPUT=$(timeout "$TIMEOUT" docker run --rm --gpus all \
 echo "$OUTPUT"
 
 # ── validate output ───────────────────────────────────────────────────────────
-RESULT=$(echo "$OUTPUT" | grep -o '{"ply_base64":.*}' | tail -1 || true)
-
-if [[ -z "$RESULT" ]]; then
-  fail "No JSON result found in output"
+# The RunPod SDK logs results as Python repr (single quotes), not JSON.
+# Check for the SDK's own success line and presence of a non-trivial ply_base64.
+if ! echo "$OUTPUT" | grep -q "completed successfully"; then
+  fail "Did not find 'completed successfully' in output"
 fi
 
-STATUS=$(echo "$RESULT" | python3 -c \
-  "import sys,json; d=json.load(sys.stdin); print(d.get('status',''))" 2>/dev/null || true)
-PLY_LEN=$(echo "$RESULT" | python3 -c \
-  "import sys,json; d=json.load(sys.stdin); print(len(d.get('ply_base64','')))" 2>/dev/null || true)
-
-if [[ "$STATUS" != "done" ]]; then
-  fail "status='$STATUS' (expected 'done')"
-fi
+PLY_LEN=$(echo "$OUTPUT" | grep -o "'ply_base64': '[^']*'" | head -1 | wc -c || true)
 
 if [[ -z "$PLY_LEN" || "$PLY_LEN" -lt 100 ]]; then
-  fail "ply_base64 is empty or suspiciously small (len=$PLY_LEN)"
+  fail "ply_base64 is empty or suspiciously small"
 fi
 
 echo ""
-pass "status=done, ply_base64 length=$PLY_LEN bytes"
+pass "Job completed successfully, ply_base64 present (~${PLY_LEN} chars sampled)"
