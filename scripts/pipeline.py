@@ -149,6 +149,7 @@ def run_brush(project_dir: Path, steps: int):
     brush_dir.mkdir(parents=True, exist_ok=True)
     export_name = f"export_{steps:06d}.ply"
     run([
+        "xvfb-run", "-a",
         str(brush_bin),
         str(colmap_dir),
         "--export-path", str(brush_dir),

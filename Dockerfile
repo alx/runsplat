@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     python3 \
     python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    xvfb \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir -p /usr/share/vulkan/icd.d /etc/vulkan/icd.d
 
 WORKDIR /app
 
