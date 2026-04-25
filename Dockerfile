@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 RUN git clone --depth 1 https://github.com/ArthurBrussee/brush.git /brush
 WORKDIR /brush
-RUN cargo build --release -p brush-cli
+RUN cargo build --release -p brush-app --bin brush
 
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04
@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y \
 RUN pip3 install --no-cache-dir runpod numpy Pillow plyfile
 
 WORKDIR /app
-COPY --from=brush-builder /brush/target/release/brush_cli /app/binaries/brush_app_linux
+COPY --from=brush-builder /brush/target/release/brush /app/binaries/brush_app_linux
 COPY . /app
 
 CMD ["python3", "-u", "handler.py"]

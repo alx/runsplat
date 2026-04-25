@@ -21,8 +21,8 @@ _LFS_MARKER = b"version https://git-lfs.github.com"
 def find_brush_binary() -> Path:
     candidates = [
         REPO_ROOT / "binaries/brush_app_linux",
-        Path.home() / "projects/brush/target/release/brush_cli",
-        Path("/usr/local/bin/brush_cli"),
+        Path.home() / "projects/brush/target/release/brush",
+        Path("/usr/local/bin/brush"),
     ]
     for p in candidates:
         if not p.exists():
@@ -33,11 +33,11 @@ def find_brush_binary() -> Path:
         if os.access(p, os.X_OK):
             return p
     raise FileNotFoundError(
-        "brush_cli binary not found or is a Git LFS stub.\n"
+        "brush binary not found or is a Git LFS stub.\n"
         "Compile it with:\n"
         "  git clone https://github.com/ArthurBrussee/brush.git\n"
-        "  cd brush && cargo build --release -p brush-cli\n"
-        f"  cp target/release/brush_cli {REPO_ROOT}/binaries/brush_app_linux"
+        "  cd brush && cargo build --release -p brush-app --bin brush\n"
+        f"  cp target/release/brush {REPO_ROOT}/binaries/brush_app_linux"
     )
 
 
