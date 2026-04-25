@@ -1,13 +1,16 @@
-# ── Stage 1: compile Brush from source ───────────────────────────────────────
-FROM rust:1.93 AS brush-builder
+# ── Stage 1: download pre-built Brush binary ──────────────────────────────────
+FROM ubuntu:24.04 AS brush-builder
 
-RUN apt-get update && apt-get install -y \
-    git pkg-config libssl-dev lld \
+RUN apt-get update && apt-get install -y curl xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone --depth 1 https://github.com/ArthurBrussee/brush.git /brush
-WORKDIR /brush
-RUN RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --release -p brush-app --bin brush
+RUN curl -fL https://github.com/ArthurBrussee/brush/releases/download/v0.3.0/brush-app-x86_64-unknown-linux-gnu.tar.xz \
+    -o /tmp/brush.tar.xz \
+    && echo "4f0f9a8785d1951c62df26aae247c02c5bba32b00f40b06df4e1c9b867399e20  /tmp/brush.tar.xz" | sha256sum -c - \
+    && tar -xJf /tmp/brush.tar.xz --strip-components=1 -C /usr/local/bin \
+        brush-app-x86_64-unknown-linux-gnu/brush_app \
+    && chmod +x /usr/local/bin/brush_app \
+    && rm /tmp/brush.tar.xz
 
 # ── Stage 2: build COLMAP with CUDA ───────────────────────────────────────────
 FROM nvidia/cuda:12.6.3-devel-ubuntu24.04 AS colmap-builder
@@ -77,7 +80,7 @@ COPY --from=colmap-builder /colmap-install/ /usr/local/
 RUN pip3 install --no-cache-dir --break-system-packages runpod numpy Pillow plyfile
 
 WORKDIR /app
-COPY --from=brush-builder /brush/target/release/brush /app/binaries/brush_app_linux
+COPY --from=brush-builder /usr/local/bin/brush_app /app/binaries/brush_app_linux
 COPY . /app
 
 CMD ["python3", "-u", "handler.py"]
