@@ -1,5 +1,5 @@
 # ── Stage 1: compile Brush from source ───────────────────────────────────────
-FROM rust:1.78-slim AS brush-builder
+FROM rust:latest AS brush-builder
 
 RUN apt-get update && apt-get install -y \
     git pkg-config libssl-dev \
