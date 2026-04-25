@@ -1,0 +1,70 @@
+{
+  "title": "RunSplat — Video to 3D Gaussian Splatting",
+  "description": "Convert drone or handheld MP4 videos into 3D Gaussian Splat (.ply) files using COLMAP for structure-from-motion and Brush for differentiable Gaussian splatting training.",
+  "type": "serverless",
+  "category": "image",
+
+  "config": {
+    "runsOn": "GPU",
+    "containerDiskInGb": 40,
+    "gpuCount": 1,
+    "gpuIds": "ADA_24",
+    "allowedCudaVersions": [
+      "12.8", "12.7", "12.6", "12.5", "12.4",
+      "12.3", "12.2", "12.1", "12.0"
+    ],
+
+    "env": [
+      {
+        "key": "TRAINING_STEPS",
+        "input": {
+          "name": "Training steps",
+          "type": "number",
+          "description": "Number of Brush training iterations. More steps produce higher quality but take longer.",
+          "min": 5000,
+          "max": 100000,
+          "default": 30000,
+          "advanced": false
+        }
+      },
+      {
+        "key": "MATCHING_TYPE",
+        "input": {
+          "name": "Feature matching strategy",
+          "type": "string",
+          "description": "Sequential matching is faster and works well for video. Exhaustive matching is more thorough but slower.",
+          "options": [
+            {"label": "Sequential (recommended for video)", "value": "sequential"},
+            {"label": "Exhaustive (for unordered image sets)", "value": "exhaustive"}
+          ],
+          "default": "sequential",
+          "advanced": true
+        }
+      }
+    ],
+
+    "presets": [
+      {
+        "name": "Fast preview (5k steps)",
+        "defaults": {
+          "TRAINING_STEPS": 5000,
+          "MATCHING_TYPE": "sequential"
+        }
+      },
+      {
+        "name": "Standard quality (30k steps)",
+        "defaults": {
+          "TRAINING_STEPS": 30000,
+          "MATCHING_TYPE": "sequential"
+        }
+      },
+      {
+        "name": "High quality (60k steps)",
+        "defaults": {
+          "TRAINING_STEPS": 60000,
+          "MATCHING_TYPE": "sequential"
+        }
+      }
+    ]
+  }
+}

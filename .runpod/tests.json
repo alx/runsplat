@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "short_video_to_ply",
+      "input": {
+        "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+        "steps": 5000
+      },
+      "timeout": 600000
+    }
+  ],
+  "config": {
+    "gpuTypeId": "NVIDIA GeForce RTX 4090",
+    "gpuCount": 1,
+    "env": [
+      {
+        "key": "TRAINING_STEPS",
+        "value": "5000"
+      },
+      {
+        "key": "MATCHING_TYPE",
+        "value": "sequential"
+      }
+    ],
+    "allowedCudaVersions": [
+      "12.8", "12.7", "12.6", "12.5", "12.4",
+      "12.3", "12.2", "12.1", "12.0"
+    ]
+  }
+}

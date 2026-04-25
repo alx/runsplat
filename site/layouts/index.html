@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Site.Title }}</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0a0a0a;
+      color: #e8e8e8;
+      min-height: 100vh;
+    }
+    header {
+      padding: 2rem;
+      border-bottom: 1px solid #222;
+    }
+    header h1 { margin: 0; font-size: 1.75rem; letter-spacing: -0.03em; }
+    header p { margin: 0.25rem 0 0; color: #888; font-size: 0.9rem; }
+    main {
+      padding: 2rem;
+      max-width: 960px;
+    }
+    h2 { font-size: 1rem; color: #aaa; font-weight: 500; margin: 0 0 1.5rem; text-transform: uppercase; letter-spacing: 0.08em; }
+    .empty { color: #555; font-size: 0.95rem; }
+    .empty code { background: #1a1a1a; padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      display: block;
+      text-decoration: none;
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .card:hover { border-color: #444; background: #161616; }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #f0f0f0;
+      margin: 0 0 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-meta {
+      font-size: 0.8rem;
+      color: #666;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.1em 0.5em;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .badge-done { background: #0d2e1a; color: #4ade80; border: 1px solid #166534; }
+    .badge-running { background: #1a1a00; color: #fbbf24; border: 1px solid #854d0e; }
+    .badge-failed { background: #2e0d0d; color: #f87171; border: 1px solid #991b1b; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>RunSplat</h1>
+    <p>3D Gaussian Splatting from video</p>
+  </header>
+  <main>
+    <h2>Projects</h2>
+    {{ $projects := where .Site.RegularPages "Section" "projects" }}
+    {{ if $projects }}
+    <div class="grid">
+      {{ range $projects }}
+      <a class="card" href="{{ .RelPermalink }}">
+        <div class="card-title">{{ .Title }}</div>
+        <div class="card-meta">
+          <span class="badge badge-{{ .Params.status | default "done" }}">{{ .Params.status | default "done" }}</span>
+          <span>{{ len .Params.videos }} video{{ if gt (len .Params.videos) 1 }}s{{ end }}</span>
+          <span>{{ .Date.Format "Jan 2, 2006" }}</span>
+        </div>
+      </a>
+      {{ end }}
+    </div>
+    {{ else }}
+    <p class="empty">No projects yet. Run <code>uv run pipeline.py --project projects/my-scene</code> to process a video.</p>
+    {{ end }}
+  </main>
+</body>
+</html>
