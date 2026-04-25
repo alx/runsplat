@@ -1,0 +1,44 @@
+<!doctype html><html lang=en><head><meta name=generator content="Hugo 0.160.1"><meta charset=UTF-8><meta name=viewport content="width=device-width,initial-scale=1"><title>RunSplat — Drone Video to 3D Gaussian Splat</title><meta name=description content="Convert drone or handheld MP4 video into a 3D Gaussian Splat scene using COLMAP and Brush — one API call, GPU-accelerated on RunPod."><meta property="og:title" content="RunSplat"><meta property="og:description" content="From drone video to 3D Gaussian Splat in one command."><meta property="og:type" content="website"><link rel=stylesheet href=/css/main.css></head><body><section class=hero><div class=container><div class=hero-badge>Open Source · RunPod Serverless · GPU-accelerated</div><h1>From Drone Video<br>to <span class=accent>3D Gaussian Splat</span><br>in One Command</h1><p class=hero-sub>Drop an MP4. Get a photorealistic 3D scene you can embed in any browser.
+Powered by COLMAP 4.0.3 and Brush — no setup, no infrastructure.</p><div class=hero-actions><a class="btn btn-primary" href=https://www.runpod.io/console/hub target=_blank rel=noopener>Run on RunPod Hub
+</a><a class="btn btn-secondary" href=https://github.com/alx/runsplat target=_blank rel=noopener>View on GitHub</a></div><div class=hero-snippet><pre><code>{
+  "input": {
+    "video_url": "https://example.com/drone-flight.mp4",
+    "steps": 30000
+  }
+}</code></pre><span class=snippet-label>RunPod API input</span></div></div></section><section class=pipeline id=pipeline><div class=container><h2>How It Works</h2><p class=section-sub>Five steps, fully automated — from raw video to an interactive 3D scene.</p><div class=pipeline-diagram aria-label="Pipeline diagram"><div class=pipe-step data-step=0><div class=pipe-icon>🎬</div><div class=pipe-label>MP4 Video</div><div class=pipe-detail>Drone or handheld footage</div></div><div class=pipe-arrow data-arrow=0><svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8H36M30 2l8 6-8 6"/></svg>
+<span>ffmpeg</span></div><div class=pipe-step data-step=1><div class=pipe-icon>🖼</div><div class=pipe-label>Frames</div><div class=pipe-detail>~150 PNG frames extracted evenly</div></div><div class=pipe-arrow data-arrow=1><svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8H36M30 2l8 6-8 6"/></svg>
+<span>COLMAP 4.0.3</span></div><div class=pipe-step data-step=2><div class=pipe-icon>📐</div><div class=pipe-label>Sparse Model</div><div class=pipe-detail>Camera poses + point cloud</div></div><div class=pipe-arrow data-arrow=2><svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8H36M30 2l8 6-8 6"/></svg>
+<span>Brush 3DGS</span></div><div class=pipe-step data-step=3><div class=pipe-icon>✨</div><div class=pipe-label>PLY File</div><div class=pipe-detail>Millions of trained Gaussians</div></div><div class=pipe-arrow data-arrow=3><svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8H36M30 2l8 6-8 6"/></svg>
+<span>convert</span></div><div class=pipe-step data-step=4><div class=pipe-icon>🌐</div><div class=pipe-label>WebGL Viewer</div><div class=pipe-detail>Interactive 3D in any browser</div></div></div><div class=pipeline-timing><div class=timing-item><span class=timing-label>Fast preview</span>
+<span class=timing-value>~5 min</span>
+<span class=timing-steps>5k steps</span></div><div class="timing-item timing-featured"><span class=timing-label>Standard quality</span>
+<span class=timing-value>~20 min</span>
+<span class=timing-steps>30k steps</span></div><div class=timing-item><span class=timing-label>High quality</span>
+<span class=timing-value>~40 min</span>
+<span class=timing-steps>60k steps</span></div></div></div></section><section class=usecases id=usecases><div class=container><h2>Built for Drone Professionals</h2><p class=section-sub>RunSplat is the 3D reconstruction engine behind future SaaS platforms serving
+drone operators, surveyors, and inspectors across multiple countries.</p><div class=usecase-grid><div class=usecase-card><div class=usecase-icon>🗺</div><h3>Volumetric Survey</h3><p>Convert survey flights into accurate 3D Gaussian scenes for stockpile volume
+estimation, earthwork progress tracking, and site documentation — without LiDAR costs.</p><ul><li>Millimeter-scale visual fidelity</li><li>PLY export compatible with GIS tools</li><li>Multi-flight compositing via video_urls</li></ul></div><div class=usecase-card><div class=usecase-icon>🏗</div><h3>Infrastructure Inspection</h3><p>Inspect bridges, towers, wind turbines, and facades. Share a navigable 3D model
+with remote engineers — timestamped for damage progression comparison.</p><ul><li>Shareable browser-based 3D viewer</li><li>No special software for reviewers</li><li>Append new flights for change detection</li></ul></div><div class=usecase-card><div class=usecase-icon>🛰</div><h3>Aerial Mapping</h3><p>Produce photorealistic 3D maps of construction zones, agricultural land, or
+coastal areas — richer than orthophotos, embeddable in any web platform.</p><ul><li>Sequential or exhaustive COLMAP matching</li><li>OPENCV_FISHEYE support for wide-angle lenses</li><li>Up to 300 frames for dense coverage</li></ul></div><div class=usecase-card><div class=usecase-icon>🎥</div><h3>Aerial Photography</h3><p>Turn a single drone flight into an immersive 3DGS scene for real estate,
+tourism, or media — embeddable in websites with one script tag.</p><ul><li>WebGL viewer, no plugin required</li><li>High-quality preset: 60k training steps</li><li>SPLAT format optimised for web streaming</li></ul></div></div><p class=saas-note>Building a drone SaaS platform?
+<a href=https://github.com/alx/runsplat target=_blank rel=noopener>RunSplat is designed to be your 3D reconstruction backend.</a></p></div></section><section class=specs id=specs><div class=container><h2>Technical Specifications</h2><div class=specs-grid><div class=spec-block><h3>Microservices</h3><table class=spec-table><tr><td>Orchestrator</td><td><a href=https://github.com/alx/runsplat>runsplat</a></td></tr><tr><td>SfM engine</td><td><a href=https://github.com/alx/colmap-serverless>colmap-serverless</a></td></tr><tr><td>3DGS trainer</td><td><a href=https://github.com/alx/brush-serverless>brush-serverless</a></td></tr><tr><td>Platform</td><td>RunPod Serverless</td></tr></table></div><div class=spec-block><h3>Versions</h3><table class=spec-table><tr><td>COLMAP</td><td>4.0.3 (built from source)</td></tr><tr><td>Brush</td><td>main (built from source)</td></tr><tr><td>CUDA</td><td>12.9</td></tr><tr><td>GPU</td><td>NVIDIA ADA 24 GB (RTX 4090)</td></tr></table></div><div class=spec-block><h3>Input</h3><table class=spec-table><tr><td>Format</td><td>MP4 video (single or multi)</td></tr><tr><td>Frames</td><td>30–500 extracted evenly</td></tr><tr><td>Camera models</td><td>SIMPLE_RADIAL, OPENCV, OPENCV_FISHEYE, PINHOLE</td></tr><tr><td>Matching</td><td>Sequential / Exhaustive</td></tr></table></div><div class=spec-block><h3>Output</h3><table class=spec-table><tr><td>PLY</td><td>3D Gaussian Splat (base64)</td></tr><tr><td>SPLAT</td><td>Web-optimised binary (base64)</td></tr><tr><td>Gaussians</td><td>500k–5M depending on scene</td></tr><tr><td>Viewer</td><td>WebGL 2.0, no plugin</td></tr></table></div></div></div></section><section class=cta id=get-started><div class=container><h2>Start Reconstructing</h2><p class=section-sub>One API call. Any MP4. Full 3D scene.</p><div class=cta-actions><a class="btn btn-primary btn-lg" href=https://www.runpod.io/console/hub target=_blank rel=noopener>Open RunPod Hub
+</a><a class="btn btn-secondary" href=https://github.com/alx/runsplat target=_blank rel=noopener>Read the Docs</a></div><div class=cta-code><div class=code-tabs><button class="code-tab active" data-target=input-block>Input</button>
+<button class=code-tab data-target=output-block>Output</button></div><pre id=input-block class="code-block active"><code>{
+  "input": {
+    "video_url": "https://example.com/drone-flight.mp4",
+    "steps": 30000,
+    "matching": "sequential",
+    "num_frames": 150,
+    "camera_model": "SIMPLE_RADIAL",
+    "gpu": true
+  }
+}</code></pre><pre id=output-block class=code-block><code>{
+  "ply_base64": "UExZCmZvcm1hdCBiaW5hcnlfbGl0dGxlX...",
+  "splat_base64": "8BsAAIABAACA...",
+  "num_gaussians": 1842311,
+  "training_time_seconds": 1187,
+  "steps_completed": 30000,
+  "status": "done"
+}</code></pre></div></div></section><footer><div class=container><p><a href=https://github.com/alx/runsplat>GitHub</a> ·
+<a href=https://www.runpod.io/console/hub>RunPod Hub</a> ·
+MIT License</p></div></footer><script src=/js/pipeline-anim.js></script></body></html>
