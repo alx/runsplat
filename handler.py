@@ -17,6 +17,7 @@ def handler(event):
     video_urls = raw if isinstance(raw, list) else [raw]
 
     steps = int(inp.get("steps", 30000))
+    gpu = bool(inp.get("gpu", True))
 
     with tempfile.TemporaryDirectory() as tmp:
         project_dir = Path(tmp) / "project"
@@ -28,15 +29,15 @@ def handler(event):
             print(f"Downloading {url} → {dest.name}", flush=True)
             urllib.request.urlretrieve(url, dest)
 
-        subprocess.run(
-            [
-                "python3", str(Path(__file__).parent / "scripts" / "pipeline.py"),
-                "--project", str(project_dir),
-                "--steps", str(steps),
-                "--gpu",
-            ],
-            check=True,
-        )
+        cmd = [
+            "python3", str(Path(__file__).parent / "scripts" / "pipeline.py"),
+            "--project", str(project_dir),
+            "--steps", str(steps),
+        ]
+        if gpu:
+            cmd.append("--gpu")
+
+        subprocess.run(cmd, check=True)
 
         output_ply = project_dir / "output.ply"
         resolved = output_ply.resolve()
