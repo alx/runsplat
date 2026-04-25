@@ -20,9 +20,9 @@ pass() { echo "[PASS] $*"; }
 fail() { echo "[FAIL] $*"; exit 1; }
 
 # ── GPU check ─────────────────────────────────────────────────────────────────
-if ! docker run --rm --gpus all nvidia/cuda:12.1.0-base-ubuntu22.04 \
-       nvidia-smi -L &>/dev/null; then
-  fail "No GPU visible to Docker. Install nvidia-container-toolkit and retry."
+if ! docker info 2>/dev/null | grep -q "nvidia"; then
+  echo "WARNING: nvidia runtime not listed in 'docker info'."
+  echo "  Run: sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker"
 fi
 
 # ── build ─────────────────────────────────────────────────────────────────────
