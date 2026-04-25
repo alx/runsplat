@@ -185,13 +185,39 @@ Or multiple videos:
 }
 ```
 
+### Docker build
+
+The `Dockerfile` uses a two-stage build:
+
+1. **`brush-builder`** — clones and compiles [Brush](https://github.com/ArthurBrussee/brush) from source using `rust:latest`
+2. **`stage-1`** — lean `nvidia/cuda` runtime with COLMAP, ffmpeg, Python deps, and the compiled binary copied in
+
+The Brush binary (~120 MB) is never committed to the repo; it is baked into the image at build time.
+
+**Build locally** (streams output, saves log):
+
+```bash
+docker build -t runsplat:local . 2>&1 | tee tmp/build-local.log
+```
+
+**Test only the Brush compile stage** (faster feedback, ~15 min):
+
+```bash
+docker build --target brush-builder -t runsplat:brush-builder . 2>&1 | tee tmp/build-brush.log
+```
+
+**Filter for errors only**:
+
+```bash
+docker build -t runsplat:local . 2>&1 | grep -E "ERROR|error|failed|Step [0-9]"
+```
+
 ### Publishing to RunPod Hub
 
-1. Push a new GitHub release (e.g. tag `v1.0.0`)
-2. RunPod Hub detects the release, builds the Docker image, and runs the tests in `.runpod/tests.json`
-3. After tests pass, submit for manual review on the [Hub page](https://www.runpod.io/console/hub)
-
-The `Dockerfile` uses a multi-stage build: Brush is compiled from source in a Rust image, then copied into the lean CUDA runtime image. The binary is never committed to the repo.
+1. Fix any issues and verify the build passes locally (`docker build -t runsplat:local .`)
+2. Commit and push, then create a new GitHub release (e.g. `gh release create v1.0.0 --generate-notes`)
+3. RunPod Hub detects the release, builds the image, and runs the tests in `.runpod/tests.json`
+4. After tests pass, submit for manual review on the [Hub page](https://www.runpod.io/console/hub)
 
 Hub configuration is in `.runpod/hub.json`. Available presets: **Fast preview** (5k steps), **Standard quality** (30k steps), **High quality** (60k steps).
 
