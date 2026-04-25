@@ -93,6 +93,8 @@ def run_colmap(
     frames_dir = project_dir / "frames"
     (colmap_dir / "distorted" / "sparse").mkdir(parents=True, exist_ok=True)
     database = colmap_dir / "database.db"
+    # COLMAP is Qt-linked and crashes in headless containers without this
+    colmap_env = {**os.environ, "QT_QPA_PLATFORM": "offscreen"}
 
     run([
         "colmap", "feature_extractor",
@@ -101,14 +103,14 @@ def run_colmap(
         "--ImageReader.single_camera", "1",
         "--ImageReader.camera_model", "SIMPLE_RADIAL",
         f"--{feature_flag}", gpu_val,
-    ])
+    ], env=colmap_env)
 
     matcher = "sequential_matcher" if matching == "sequential" else "exhaustive_matcher"
     run([
         "colmap", matcher,
         "--database_path", str(database),
         f"--{matching_flag}", gpu_val,
-    ])
+    ], env=colmap_env)
 
     run([
         "colmap", "mapper",
@@ -116,7 +118,7 @@ def run_colmap(
         "--image_path", str(frames_dir),
         "--output_path", str(colmap_dir / "distorted" / "sparse"),
         "--Mapper.ba_global_function_tolerance=0.000001",
-    ])
+    ], env=colmap_env)
 
     run([
         "colmap", "image_undistorter",
@@ -124,7 +126,7 @@ def run_colmap(
         "--input_path", str(colmap_dir / "distorted" / "sparse" / "0"),
         "--output_path", str(colmap_dir),
         "--output_type", "COLMAP",
-    ])
+    ], env=colmap_env)
 
 
 def run_brush(project_dir: Path, steps: int):
