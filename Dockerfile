@@ -2,12 +2,12 @@
 FROM rust:1.93 AS brush-builder
 
 RUN apt-get update && apt-get install -y \
-    git pkg-config libssl-dev \
+    git pkg-config libssl-dev lld \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --depth 1 https://github.com/ArthurBrussee/brush.git /brush
 WORKDIR /brush
-RUN cargo build --release -p brush-app --bin brush
+RUN RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --release -p brush-app --bin brush
 
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04
