@@ -12,6 +12,8 @@ RUN RUSTFLAGS="-C link-arg=-fuse-ld=lld" cargo build --release -p brush-app --bi
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
 FROM nvidia/cuda:12.1.0-base-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
+# graphics capability is required for Vulkan (used by brush/wgpu)
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
 
 RUN apt-get update && apt-get install -y \
     colmap \
@@ -20,6 +22,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     libgl1 \
     libglib2.0-0 \
+    libvulkan1 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-cache-dir runpod numpy Pillow plyfile
