@@ -85,15 +85,16 @@ def extract_frames(mp4_path: Path, frames_dir: Path, step: int, prefix: str):
 
 
 def run_colmap(
-    project_dir: Path, use_gpu: bool, matching: str,
+    project_dir: Path, matching: str,
     feature_flag: str, matching_flag: str,
 ):
-    gpu_val = "1" if use_gpu else "0"
     colmap_dir = project_dir / "colmap"
     frames_dir = project_dir / "frames"
     (colmap_dir / "distorted" / "sparse").mkdir(parents=True, exist_ok=True)
     database = colmap_dir / "database.db"
-    # COLMAP is Qt-linked and crashes in headless containers without this
+    # COLMAP (Ubuntu 22.04 package, v3.7) GPU SIFT uses OpenGL, not CUDA —
+    # OpenGL context creation fails in headless containers even with a real GPU.
+    # CPU SIFT is reliable and fast enough for this use case.
     colmap_env = {**os.environ, "QT_QPA_PLATFORM": "offscreen"}
 
     run([
@@ -102,14 +103,14 @@ def run_colmap(
         "--image_path", str(frames_dir),
         "--ImageReader.single_camera", "1",
         "--ImageReader.camera_model", "SIMPLE_RADIAL",
-        f"--{feature_flag}", gpu_val,
+        f"--{feature_flag}", "0",
     ], env=colmap_env)
 
     matcher = "sequential_matcher" if matching == "sequential" else "exhaustive_matcher"
     run([
         "colmap", matcher,
         "--database_path", str(database),
-        f"--{matching_flag}", gpu_val,
+        f"--{matching_flag}", "0",
     ], env=colmap_env)
 
     run([
@@ -268,7 +269,7 @@ def main():
         if start > pipeline_steps.index("frames"):
             feature_flag, matching_flag = detect_colmap_gpu_flags()
         print("\n[colmap] Running COLMAP reconstruction...", flush=True)
-        run_colmap(project_dir, args.gpu, args.matching, feature_flag, matching_flag)
+        run_colmap(project_dir, args.matching, feature_flag, matching_flag)
 
     if start <= pipeline_steps.index("brush"):
         print("\n[brush] Running Brush 3DGS training...", flush=True)

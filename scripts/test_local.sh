@@ -39,9 +39,7 @@ fi
 echo ""
 echo "Running test job (steps=$STEPS, timeout=${TIMEOUT}s) ..."
 
-# gpu:false — COLMAP GPU SIFT needs OpenGL which isn't available in local Docker;
-# brush training still uses CUDA via --gpus all
-TEST_INPUT=$(printf '{"input":{"video_url":"%s","steps":%d,"gpu":false}}' "$VIDEO_URL" "$STEPS")
+TEST_INPUT=$(printf '{"input":{"video_url":"%s","steps":%d}}' "$VIDEO_URL" "$STEPS")
 
 OUTPUT=$(timeout "$TIMEOUT" docker run --rm --gpus all \
   "$IMAGE" \
