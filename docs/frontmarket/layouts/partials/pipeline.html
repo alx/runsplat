@@ -1,0 +1,68 @@
+<section class="pipeline" id="pipeline">
+  <div class="container">
+    <h2>How It Works</h2>
+    <p class="section-sub">Five steps, fully automated — from raw video to an interactive 3D scene.</p>
+
+    <div class="pipeline-diagram" aria-label="Pipeline diagram">
+      <div class="pipe-step" data-step="0">
+        <div class="pipe-icon">🎬</div>
+        <div class="pipe-label">MP4 Video</div>
+        <div class="pipe-detail">Drone or handheld footage</div>
+      </div>
+      <div class="pipe-arrow" data-arrow="0">
+        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <span>ffmpeg</span>
+      </div>
+      <div class="pipe-step" data-step="1">
+        <div class="pipe-icon">🖼</div>
+        <div class="pipe-label">Frames</div>
+        <div class="pipe-detail">~150 PNG frames extracted evenly</div>
+      </div>
+      <div class="pipe-arrow" data-arrow="1">
+        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <span>COLMAP 4.0.3</span>
+      </div>
+      <div class="pipe-step" data-step="2">
+        <div class="pipe-icon">📐</div>
+        <div class="pipe-label">Sparse Model</div>
+        <div class="pipe-detail">Camera poses + point cloud</div>
+      </div>
+      <div class="pipe-arrow" data-arrow="2">
+        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <span>Brush 3DGS</span>
+      </div>
+      <div class="pipe-step" data-step="3">
+        <div class="pipe-icon">✨</div>
+        <div class="pipe-label">PLY File</div>
+        <div class="pipe-detail">Millions of trained Gaussians</div>
+      </div>
+      <div class="pipe-arrow" data-arrow="3">
+        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <span>convert</span>
+      </div>
+      <div class="pipe-step" data-step="4">
+        <div class="pipe-icon">🌐</div>
+        <div class="pipe-label">WebGL Viewer</div>
+        <div class="pipe-detail">Interactive 3D in any browser</div>
+      </div>
+    </div>
+
+    <div class="pipeline-timing">
+      <div class="timing-item">
+        <span class="timing-label">Fast preview</span>
+        <span class="timing-value">~5 min</span>
+        <span class="timing-steps">5k steps</span>
+      </div>
+      <div class="timing-item timing-featured">
+        <span class="timing-label">Standard quality</span>
+        <span class="timing-value">~20 min</span>
+        <span class="timing-steps">30k steps</span>
+      </div>
+      <div class="timing-item">
+        <span class="timing-label">High quality</span>
+        <span class="timing-value">~40 min</span>
+        <span class="timing-steps">60k steps</span>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,47 @@
+<section class="specs" id="specs">
+  <div class="container">
+    <h2>Technical Specifications</h2>
+
+    <div class="specs-grid">
+      <div class="spec-block">
+        <h3>Microservices</h3>
+        <table class="spec-table">
+          <tr><td>Orchestrator</td><td><a href="https://github.com/alx/runsplat">runsplat</a></td></tr>
+          <tr><td>SfM engine</td><td><a href="https://github.com/alx/colmap-serverless">colmap-serverless</a></td></tr>
+          <tr><td>3DGS trainer</td><td><a href="https://github.com/alx/brush-serverless">brush-serverless</a></td></tr>
+          <tr><td>Platform</td><td>RunPod Serverless</td></tr>
+        </table>
+      </div>
+
+      <div class="spec-block">
+        <h3>Versions</h3>
+        <table class="spec-table">
+          <tr><td>COLMAP</td><td>4.0.3 (built from source)</td></tr>
+          <tr><td>Brush</td><td>main (built from source)</td></tr>
+          <tr><td>CUDA</td><td>12.9</td></tr>
+          <tr><td>GPU</td><td>NVIDIA ADA 24 GB (RTX 4090)</td></tr>
+        </table>
+      </div>
+
+      <div class="spec-block">
+        <h3>Input</h3>
+        <table class="spec-table">
+          <tr><td>Format</td><td>MP4 video (single or multi)</td></tr>
+          <tr><td>Frames</td><td>30–500 extracted evenly</td></tr>
+          <tr><td>Camera models</td><td>SIMPLE_RADIAL, OPENCV, OPENCV_FISHEYE, PINHOLE</td></tr>
+          <tr><td>Matching</td><td>Sequential / Exhaustive</td></tr>
+        </table>
+      </div>
+
+      <div class="spec-block">
+        <h3>Output</h3>
+        <table class="spec-table">
+          <tr><td>PLY</td><td>3D Gaussian Splat (base64)</td></tr>
+          <tr><td>SPLAT</td><td>Web-optimised binary (base64)</td></tr>
+          <tr><td>Gaussians</td><td>500k–5M depending on scene</td></tr>
+          <tr><td>Viewer</td><td>WebGL 2.0, no plugin</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

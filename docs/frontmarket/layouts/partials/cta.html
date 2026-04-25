@@ -1,0 +1,40 @@
+<section class="cta" id="get-started">
+  <div class="container">
+    <h2>Start Reconstructing</h2>
+    <p class="section-sub">One API call. Any MP4. Full 3D scene.</p>
+
+    <div class="cta-actions">
+      <a class="btn btn-primary btn-lg" href="https://www.runpod.io/console/hub" target="_blank" rel="noopener">
+        Open RunPod Hub
+      </a>
+      <a class="btn btn-secondary" href="https://github.com/alx/runsplat" target="_blank" rel="noopener">
+        Read the Docs
+      </a>
+    </div>
+
+    <div class="cta-code">
+      <div class="code-tabs">
+        <button class="code-tab active" data-target="input-block">Input</button>
+        <button class="code-tab" data-target="output-block">Output</button>
+      </div>
+      <pre id="input-block" class="code-block active"><code>{
+  "input": {
+    "video_url": "https://example.com/drone-flight.mp4",
+    "steps": 30000,
+    "matching": "sequential",
+    "num_frames": 150,
+    "camera_model": "SIMPLE_RADIAL",
+    "gpu": true
+  }
+}</code></pre>
+      <pre id="output-block" class="code-block"><code>{
+  "ply_base64": "UExZCmZvcm1hdCBiaW5hcnlfbGl0dGxlX...",
+  "splat_base64": "8BsAAIABAACA...",
+  "num_gaussians": 1842311,
+  "training_time_seconds": 1187,
+  "steps_completed": 30000,
+  "status": "done"
+}</code></pre>
+    </div>
+  </div>
+</section>

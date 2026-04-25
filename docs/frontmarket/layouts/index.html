@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RunSplat — Drone Video to 3D Gaussian Splat</title>
+  <meta name="description" content="Convert drone or handheld MP4 video into a 3D Gaussian Splat scene using COLMAP and Brush — one API call, GPU-accelerated on RunPod.">
+  <meta property="og:title" content="RunSplat">
+  <meta property="og:description" content="From drone video to 3D Gaussian Splat in one command.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+  {{ partial "hero.html" . }}
+  {{ partial "pipeline.html" . }}
+  {{ partial "usecases.html" . }}
+  {{ partial "specs.html" . }}
+  {{ partial "cta.html" . }}
+
+  <footer>
+    <div class="container">
+      <p>
+        <a href="https://github.com/alx/runsplat">GitHub</a> ·
+        <a href="https://www.runpod.io/console/hub">RunPod Hub</a> ·
+        MIT License
+      </p>
+    </div>
+  </footer>
+
+  <script src="/js/pipeline-anim.js"></script>
+</body>
+</html>

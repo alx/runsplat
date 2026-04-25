@@ -1,0 +1,5 @@
+baseURL = "https://alx.github.io/runsplat/"
+title = "RunSplat"
+languageCode = "en-us"
+enableRobotsTXT = true
+disableKinds = ["taxonomy", "term", "RSS"]

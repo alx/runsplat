@@ -10,3 +10,5 @@ __pycache__/
 .uv/
 /pipeline.py
 /target/
+/docs/frontmarket/public/
+/docs/frontmarket/.hugo_build.lock
