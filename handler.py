@@ -37,7 +37,9 @@ def handler(event):
         if gpu:
             cmd.append("--gpu")
 
-        subprocess.run(cmd, check=True)
+        result = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
+        if result.returncode != 0:
+            return {"error": f"Pipeline failed (exit {result.returncode}):\n{result.stderr[-3000:]}"}
 
         output_ply = project_dir / "output.ply"
         resolved = output_ply.resolve()

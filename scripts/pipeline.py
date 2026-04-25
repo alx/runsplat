@@ -109,6 +109,7 @@ def run_colmap(
         "colmap", matcher,
         "--database_path", str(database),
         f"--{matching_flag}", gpu_val,
+        *(["--SequentialMatching.overlap", "10"] if matching == "sequential" else []),
     ], env=colmap_env)
 
     run([
@@ -119,10 +120,22 @@ def run_colmap(
         "--Mapper.ba_global_function_tolerance=0.000001",
     ], env=colmap_env)
 
+    sparse_0 = colmap_dir / "distorted" / "sparse" / "0"
+    if not sparse_0.exists():
+        found = sorted((colmap_dir / "distorted" / "sparse").glob("*"))
+        print(
+            f"Error: COLMAP mapper produced no reconstruction (sparse/0 missing).\n"
+            f"  Expected: {sparse_0}\n"
+            f"  Found: {[p.name for p in found] or 'nothing'}\n"
+            f"  Too few inlier feature matches — try a slower video or --matching exhaustive.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
     run([
         "colmap", "image_undistorter",
         "--image_path", str(frames_dir),
-        "--input_path", str(colmap_dir / "distorted" / "sparse" / "0"),
+        "--input_path", str(sparse_0),
         "--output_path", str(colmap_dir),
         "--output_type", "COLMAP",
     ], env=colmap_env)
