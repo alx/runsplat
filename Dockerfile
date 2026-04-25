@@ -12,18 +12,19 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /app/binaries \
+WORKDIR /app
+
+RUN mkdir -p binaries \
     && curl -fL https://github.com/ArthurBrussee/brush/releases/download/v0.3.0/brush-app-x86_64-unknown-linux-gnu.tar.xz \
         -o /tmp/brush.tar.xz \
     && echo "4f0f9a8785d1951c62df26aae247c02c5bba32b00f40b06df4e1c9b867399e20  /tmp/brush.tar.xz" | sha256sum -c - \
-    && tar -xJf /tmp/brush.tar.xz --strip-components=1 -C /app/binaries \
+    && tar -xJf /tmp/brush.tar.xz --strip-components=1 -C binaries \
+        --transform='s/brush_app/brush_app_linux/' \
         brush-app-x86_64-unknown-linux-gnu/brush_app \
-    && mv /app/binaries/brush_app /app/binaries/brush_app_linux \
     && rm /tmp/brush.tar.xz
 
 RUN pip3 install --no-cache-dir --break-system-packages runpod numpy Pillow plyfile
 
-WORKDIR /app
 COPY . /app
 
 CMD ["python3", "-u", "handler.py"]
