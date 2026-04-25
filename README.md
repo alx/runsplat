@@ -1,29 +1,87 @@
 # RunSplat
 
-Convert drone or handheld video into a 3D Gaussian Splatting scene in one command.
+Convert drone or handheld video into an interactive **3D Gaussian Splat** scene — viewable in any browser, no software required.
 
-```
-MP4 video(s)
-    │
-    ▼
-ffmpeg — extract ~150 frames
-    │
-    ▼
-COLMAP — structure-from-motion (camera poses + sparse point cloud)
-    │
-    ▼
-Brush — 3D Gaussian Splatting training
-    │
-    ▼
-output.ply + output.splat
-```
+> Fly around and see your scene exactly as it is, from every angle, with real photographic textures. Not a point cloud. Not a basic mesh. The actual place.
 
-Results are visualised in a local Hugo website with an in-browser WebGL splat viewer.
-The same pipeline is deployable as a serverless GPU endpoint on [RunPod Hub](https://www.runpod.io/console/hub).
+- See your land as it really looks
+- Easier to understand than technical maps
+- Ideal for design, planning, and client presentations
+- Take remote measurements without revisiting the site
+- Track construction progress or erosion over time
+
+Explore the ecosystem: [superspl.at](https://superspl.at/) — [antimatter15/splat WebGL viewer](https://antimatter15.com/splat/)
 
 ---
 
-## Prerequisites
+## Architecture
+
+RunSplat is built as three independent serverless services:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  runsplat  (this repo)                                      │
+│  Sequential orchestrator + result web viewer                │
+│                                                             │
+│  MP4 video(s)                                               │
+│      │                                                      │
+│      ▼  ffmpeg — extract frames                             │
+│      │                                                      │
+│      ▼  COLMAP 4.0.3 ── ── ── ── also available as         │
+│      │                          colmap-serverless endpoint  │
+│      ▼  Brush 3DGS training ─── also available as          │
+│      │                          brush-serverless endpoint   │
+│      ▼  PLY → SPLAT conversion                             │
+│      │                                                      │
+│      ▼  output.ply + output.splat                           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Repo | Role | RunPod Hub |
+|------|------|-----------|
+| **runsplat** (this repo) | Full pipeline + result viewer | Video → PLY |
+| [colmap-serverless](https://github.com/alx/colmap-serverless) | COLMAP SfM only | Video → COLMAP workspace |
+| [brush-serverless](https://github.com/alx/brush-serverless) | Brush 3DGS training only | COLMAP workspace → PLY |
+
+The runsplat Docker image pulls compiled binaries from both upstream images — COLMAP and Brush are never rebuilt here:
+
+```dockerfile
+FROM ghcr.io/alx/colmap-serverless:latest AS colmap-stage
+FROM ghcr.io/alx/brush-serverless:latest  AS brush-stage
+FROM ghcr.io/alx/colmap-serverless:latest
+COPY --from=brush-stage /app/binaries/brush_app_linux /app/binaries/brush_app_linux
+```
+
+---
+
+## Why Gaussian Splatting?
+
+Traditional photogrammetry outputs meshes or point clouds. 3D Gaussian Splatting lets you **fly through a real scene with photographic accuracy**, not an approximation:
+
+- **See your land as it really looks** — every texture, every shadow, every surface
+- **Easier to understand** — clients and decision-makers grasp it instantly
+- **Design and planning** — walk through a space before it's built
+- **Remote measurements** — measure distances and areas from the browser
+- **No heavy software** — a URL is enough; WebGL runs everywhere
+- **Change detection** — compare two captures of the same site over time
+
+---
+
+## Drone capture tips
+
+The quality of your Gaussian Splat is determined by how well COLMAP can reconstruct camera poses, which depends on **diversity of viewing angles**. Circular flight patterns outperform grid surveys:
+
+> *Unlike traditional grid or double-grid patterns, Circlegrammetry enables drones to fly in circular patterns, with the camera angled between 45° and 70° toward the center of each circle. This method captures images from more angles in fewer flights.*
+>
+> — [SPH Engineering, Circlegrammetry](https://www.sphengineering.com/news/sph-engineering-launches-circlegrammetry-a-game-changer-in-drone-photogrammetry)
+
+More viewing angles → stronger COLMAP reconstruction → better Gaussian Splat.
+
+---
+
+## Quick start (local)
+
+### Prerequisites
 
 | Tool | Install |
 |------|---------|
@@ -35,32 +93,28 @@ The same pipeline is deployable as a serverless GPU endpoint on [RunPod Hub](htt
 
 ### Getting the Brush binary
 
-The Brush 3DGS trainer binary is not included in this repo (120 MB). Compile it once:
+Compile from source (requires [Rust](https://rustup.rs)):
 
 ```bash
 git clone https://github.com/ArthurBrussee/brush.git
 cd brush
-cargo build --release
+cargo build --release -p brush-app --bin brush_app
 cp target/release/brush_app /path/to/runsplat/binaries/brush_app_linux
 ```
 
-Rust installation: https://rustup.rs
+> **Docker / RunPod:** both binaries are compiled automatically during image build — no manual step needed.
 
-> **Docker / RunPod**: the binary is compiled automatically during `docker build` — no manual step needed.
-
----
-
-## Quick start
+### Run the pipeline
 
 ```bash
 # 1. Create a project and add your video(s)
 mkdir -p projects/my-scene/input
-cp my-video.mp4 projects/my-scene/input/
+cp drone-flight.mp4 projects/my-scene/input/
 
 # 2. Run the full pipeline
 uv run scripts/pipeline.py --project projects/my-scene --gpu
 
-# 3. Browse results
+# 3. View results
 cd site && hugo server
 # Open http://localhost:1313
 ```
@@ -68,7 +122,7 @@ cd site && hugo server
 Multiple input videos are combined into a single reconstruction:
 
 ```bash
-cp pass1.mp4 pass2.mp4 projects/my-scene/input/
+cp pass-north.mp4 pass-south.mp4 projects/my-scene/input/
 uv run scripts/pipeline.py --project projects/my-scene --gpu
 ```
 
@@ -94,7 +148,7 @@ uv run scripts/pipeline.py --project <dir> [options]
 # Re-run only Brush training and everything after
 uv run scripts/pipeline.py --project projects/my-scene --from-step brush
 
-# Re-convert PLY → SPLAT and regenerate site data only
+# Re-convert PLY → SPLAT only
 uv run scripts/pipeline.py --project projects/my-scene --from-step convert
 ```
 
@@ -102,61 +156,53 @@ uv run scripts/pipeline.py --project projects/my-scene --from-step convert
 
 ## Project folder structure
 
-After a successful run:
-
 ```
 projects/my-scene/
 ├── input/                   # Your original MP4 files
-│   └── my-video.mp4
-├── frames/                  # Extracted PNG frames (all videos combined)
+├── frames/                  # Extracted PNG frames
 ├── colmap/
 │   ├── database.db          # Feature/match database
-│   ├── distorted/sparse/0/  # Raw COLMAP reconstruction
-│   ├── images/              # Undistorted images
-│   └── sparse/0/            # Undistorted sparse model (Brush input)
+│   ├── images/              # Undistorted frames (Brush input)
+│   └── sparse/0/            # Camera poses + sparse point cloud
 ├── brush/
-│   ├── export_005000.ply    # Intermediate exports
-│   ├── export_010000.ply
-│   ├── ...
+│   ├── export_005000.ply    # Intermediate checkpoints
 │   ├── export_030000.ply    # Final export
 │   └── export.ply           # Symlink → latest export
 ├── output.ply               # Symlink → brush/export.ply
-├── output.splat             # Binary splat format for web viewer
-└── metadata.json            # Project status and video list
+├── output.splat             # Web-optimised binary for viewer
+└── metadata.json
 ```
 
 ---
 
-## Hugo site
+## Result viewer
 
-The pipeline automatically populates the Hugo site under `site/`. To view:
+The pipeline auto-populates a Hugo site under `site/` with an in-browser WebGL splat viewer:
 
 ```bash
 cd site && hugo server
+# http://localhost:1313
 ```
 
-- **Homepage** (`/`) — card list of all processed projects
-- **Project page** (`/projects/<name>/`) — video player(s) on the left, interactive WebGL splat viewer on the right
+- **Homepage** — card list of all processed projects
+- **Project page** — video player(s) on the left, interactive 3D viewer on the right
 
-The splat viewer is a self-hosted copy of [antimatter15/splat](https://github.com/antimatter15/splat) served from `site/static/viewer/`.
+The viewer is a self-hosted copy of [antimatter15/splat](https://github.com/antimatter15/splat) — no external dependency, no plugin, pure WebGL 2.0.
 
 ---
 
-## RunPod Hub deployment
+## RunPod Hub
 
-### How it works
+### Full pipeline endpoint (this repo)
 
-The `handler.py` serverless handler:
-1. Downloads video URL(s) from the job input
-2. Runs the full pipeline (`scripts/pipeline.py`)
-3. Returns the final `.ply` as a base64-encoded string
+One API call runs the entire pipeline: download → frames → COLMAP → Brush → PLY.
 
-### API input
+**Input:**
 
 ```json
 {
   "input": {
-    "video_url": "https://example.com/my-video.mp4",
+    "video_url": "https://example.com/drone-flight.mp4",
     "steps": 30000
   }
 }
@@ -168,64 +214,78 @@ Or multiple videos:
 {
   "input": {
     "video_urls": [
-      "https://example.com/pass1.mp4",
-      "https://example.com/pass2.mp4"
+      "https://example.com/pass-north.mp4",
+      "https://example.com/pass-south.mp4"
     ],
     "steps": 30000
   }
 }
 ```
 
-### API output
+**Output:**
 
 ```json
 {
-  "ply_base64": "<base64-encoded PLY file>",
+  "ply_base64": "<base64 PLY file>",
   "status": "done"
 }
 ```
 
-### Docker build
+Presets: **Fast preview** (5k steps, ~5 min), **Standard quality** (30k, ~20 min), **High quality** (60k, ~40 min).
 
-The `Dockerfile` uses a two-stage build:
+### Separate endpoints
 
-1. **`brush-builder`** — clones and compiles [Brush](https://github.com/ArthurBrussee/brush) from source using `rust:latest`
-2. **`stage-1`** — lean `nvidia/cuda` runtime with COLMAP, ffmpeg, Python deps, and the compiled binary copied in
+Use [colmap-serverless](https://github.com/alx/colmap-serverless) and [brush-serverless](https://github.com/alx/brush-serverless) independently when you need finer control — for example, running COLMAP once and experimenting with different Brush training parameters.
 
-The Brush binary (~120 MB) is never committed to the repo; it is baked into the image at build time.
+---
 
-**Build locally** (streams output, saves log):
+## Docker
 
-```bash
-docker build -t runsplat:local . 2>&1 | tee tmp/build-local.log
-```
+### Build and test
 
-**Test only the Brush compile stage** (faster feedback, ~15 min):
+The runsplat image layers on top of the two upstream images. Both must be published to GHCR before building:
 
 ```bash
-docker build --target brush-builder -t runsplat:brush-builder . 2>&1 | tee tmp/build-brush.log
+# Build
+docker build -t runsplat:local .
+
+# Test full pipeline
+./scripts/test_local.sh
+
+# Test COLMAP image only (requires ~/code/colmap-serverless)
+./scripts/test_local_colmap.sh
+
+# Test Brush image only (requires ~/code/brush-serverless)
+./scripts/test_local_brush.sh
 ```
 
-**Filter for errors only**:
+### Publishing
+
+1. Publish `colmap-serverless` and `brush-serverless` images to GHCR first
+2. Build and test `runsplat:local` locally
+3. `gh release create v1.0.0 --generate-notes`
+4. RunPod Hub builds the image and runs `.runpod/tests.json`
+
+---
+
+## Marketing site
+
+A Hugo marketing site lives at `docs/frontmarket/` and is deployed to GitHub Pages on every push:
 
 ```bash
-docker build -t runsplat:local . 2>&1 | grep -E "ERROR|error|failed|Step [0-9]"
+cd docs/frontmarket && hugo server
+# http://localhost:1313
 ```
 
-### Publishing to RunPod Hub
-
-1. Fix any issues and verify the build passes locally (`docker build -t runsplat:local .`)
-2. Commit and push, then create a new GitHub release (e.g. `gh release create v1.0.0 --generate-notes`)
-3. RunPod Hub detects the release, builds the image, and runs the tests in `.runpod/tests.json`
-4. After tests pass, submit for manual review on the [Hub page](https://www.runpod.io/console/hub)
-
-Hub configuration is in `.runpod/hub.json`. Available presets: **Fast preview** (5k steps), **Standard quality** (30k steps), **High quality** (60k steps).
+Live at: `https://alx.github.io/runsplat/`
 
 ---
 
 ## Credits
 
-- [Brush](https://github.com/ArthurBrussee/brush) — 3D Gaussian Splatting trainer
-- [COLMAP](https://github.com/colmap/colmap) — Structure-from-Motion
-- [antimatter15/splat](https://github.com/antimatter15/splat) — WebGL Gaussian splat viewer
+- [Brush](https://github.com/ArthurBrussee/brush) — Arthur Brussee, 3DGS trainer
+- [COLMAP](https://github.com/colmap/colmap) — Schönberger & Frahm, Structure-from-Motion
+- [antimatter15/splat](https://github.com/antimatter15/splat) — Kevin Kwok, WebGL viewer
+- [superspl.at](https://superspl.at/) — The Home for 3D Gaussian Splatting
+- [SPH Engineering](https://www.sphengineering.com/news/sph-engineering-launches-circlegrammetry-a-game-changer-in-drone-photogrammetry) — Circlegrammetry capture technique
 - [skysplat_blender](https://github.com/kyjohnso/skysplat_blender) — Blender addon this pipeline is based on

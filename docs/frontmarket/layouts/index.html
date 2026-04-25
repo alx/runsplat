@@ -8,7 +8,7 @@
   <meta property="og:title" content="RunSplat">
   <meta property="og:description" content="From drone video to 3D Gaussian Splat in one command.">
   <meta property="og:type" content="website">
-  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
 </head>
 <body>
   {{ partial "hero.html" . }}
@@ -27,6 +27,6 @@
     </div>
   </footer>
 
-  <script src="/js/pipeline-anim.js"></script>
+  <script src="{{ "js/pipeline-anim.js" | relURL }}"></script>
 </body>
 </html>
