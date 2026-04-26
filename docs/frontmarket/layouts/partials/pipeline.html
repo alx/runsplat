@@ -6,44 +6,54 @@
     <div class="pipeline-diagram" aria-label="Pipeline diagram">
       <div class="pipe-step" data-step="0">
         <div class="pipe-icon">🎬</div>
-        <div class="pipe-label">MP4 Video</div>
-        <div class="pipe-detail">Drone or handheld footage</div>
+        <div class="pipe-content">
+          <div class="pipe-label">MP4 Video</div>
+          <div class="pipe-detail">Drone or handheld footage</div>
+        </div>
       </div>
       <div class="pipe-arrow" data-arrow="0">
-        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <svg viewBox="0 0 16 40" aria-hidden="true"><path class="arrow-path" d="M8 0 V36 M2 30 L8 38 L14 30"/></svg>
         <span>ffmpeg</span>
       </div>
       <div class="pipe-step" data-step="1">
         <div class="pipe-icon">🖼</div>
-        <div class="pipe-label">Frames</div>
-        <div class="pipe-detail">~150 PNG frames extracted evenly</div>
+        <div class="pipe-content">
+          <div class="pipe-label">Frames</div>
+          <div class="pipe-detail">~150 PNG frames extracted evenly</div>
+        </div>
       </div>
       <div class="pipe-arrow" data-arrow="1">
-        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <svg viewBox="0 0 16 40" aria-hidden="true"><path class="arrow-path" d="M8 0 V36 M2 30 L8 38 L14 30"/></svg>
         <span>COLMAP 4.0.3</span>
       </div>
       <div class="pipe-step" data-step="2">
         <div class="pipe-icon">📐</div>
-        <div class="pipe-label">Sparse Model</div>
-        <div class="pipe-detail">Camera poses + point cloud</div>
+        <div class="pipe-content">
+          <div class="pipe-label">Sparse Model</div>
+          <div class="pipe-detail">Camera poses + point cloud</div>
+        </div>
       </div>
       <div class="pipe-arrow" data-arrow="2">
-        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <svg viewBox="0 0 16 40" aria-hidden="true"><path class="arrow-path" d="M8 0 V36 M2 30 L8 38 L14 30"/></svg>
         <span>Brush 3DGS</span>
       </div>
       <div class="pipe-step" data-step="3">
         <div class="pipe-icon">✨</div>
-        <div class="pipe-label">PLY File</div>
-        <div class="pipe-detail">Millions of trained Gaussians</div>
+        <div class="pipe-content">
+          <div class="pipe-label">PLY File</div>
+          <div class="pipe-detail">Millions of trained Gaussians</div>
+        </div>
       </div>
       <div class="pipe-arrow" data-arrow="3">
-        <svg viewBox="0 0 40 16" aria-hidden="true"><path class="arrow-path" d="M0 8 H36 M30 2 L38 8 L30 14"/></svg>
+        <svg viewBox="0 0 16 40" aria-hidden="true"><path class="arrow-path" d="M8 0 V36 M2 30 L8 38 L14 30"/></svg>
         <span>convert</span>
       </div>
       <div class="pipe-step" data-step="4">
         <div class="pipe-icon">🌐</div>
-        <div class="pipe-label">WebGL Viewer</div>
-        <div class="pipe-detail">Interactive 3D in any browser</div>
+        <div class="pipe-content">
+          <div class="pipe-label">WebGL Viewer</div>
+          <div class="pipe-detail">Interactive 3D in any browser</div>
+        </div>
       </div>
     </div>
 

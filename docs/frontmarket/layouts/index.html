@@ -9,19 +9,29 @@
   <meta property="og:description" content="From drone video to 3D Gaussian Splat in one command.">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="{{ "css/main.css" | relURL }}">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WFEE8LPLP9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-WFEE8LPLP9');
+  </script>
 </head>
 <body>
   {{ partial "hero.html" . }}
   {{ partial "pipeline.html" . }}
   {{ partial "usecases.html" . }}
   {{ partial "specs.html" . }}
+  {{ partial "cta2.html" . }}
   {{ partial "cta.html" . }}
+  {{ partial "contact.html" . }}
 
   <footer>
     <div class="container">
       <p>
         <a href="https://github.com/alx/runsplat">GitHub</a> ·
-        <a href="https://www.runpod.io/console/hub">RunPod Hub</a> ·
+        <a href="https://runpod.io?ref=86vg8vmz">RunPod Hub</a> ·
         MIT License
       </p>
     </div>
