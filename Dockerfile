@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 # Add Brush binary from brush-serverless image
 COPY --from=brush-stage /app/binaries/brush_app_linux /app/binaries/brush_app_linux
 
-RUN pip3 install --no-cache-dir --break-system-packages numpy Pillow plyfile
+RUN pip3 install --no-cache-dir --break-system-packages numpy Pillow plyfile runpod
 
 WORKDIR /app
 COPY . /app

@@ -1,7 +1,9 @@
 import base64
+import os
 import subprocess
 import tempfile
 import urllib.request
+from collections import deque
 from pathlib import Path
 
 import runpod
@@ -16,7 +18,9 @@ def handler(event):
         return {"error": "Provide video_url (string) or video_urls (list of strings)"}
     video_urls = raw if isinstance(raw, list) else [raw]
 
-    steps = int(inp.get("steps", 30000))
+    # Job input takes priority over env vars (set via RunPod Hub config)
+    steps = int(inp.get("steps") or os.environ.get("TRAINING_STEPS") or 30000)
+    matching = inp.get("matching") or os.environ.get("MATCHING_TYPE") or "sequential"
     gpu = bool(inp.get("gpu", True))
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -33,13 +37,25 @@ def handler(event):
             "python3", str(Path(__file__).parent / "scripts" / "pipeline.py"),
             "--project", str(project_dir),
             "--steps", str(steps),
+            "--matching", matching,
         ]
         if gpu:
             cmd.append("--gpu")
 
-        result = subprocess.run(cmd, stderr=subprocess.PIPE, text=True)
-        if result.returncode != 0:
-            return {"error": f"Pipeline failed (exit {result.returncode}):\n{result.stderr[-3000:]}"}
+        proc = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        tail = deque(maxlen=100)
+        for line in proc.stdout or []:
+            print(line, end="", flush=True)
+            tail.append(line)
+        proc.wait()
+
+        if proc.returncode != 0:
+            return {"error": f"Pipeline failed (exit {proc.returncode}):\n{''.join(tail)}"}
 
         output_ply = project_dir / "output.ply"
         resolved = output_ply.resolve()
